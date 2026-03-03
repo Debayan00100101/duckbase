@@ -169,7 +169,7 @@ if not st.session_state.user:
 
 else:
     user = get_user(st.session_state.user)
-    username, balance, pfp_path, last_play, duck_card, duck_coin = user
+    username, balance, pfp_path, duck_card, duck_coin = user
 
     # SIDEBAR
     with st.sidebar:
@@ -284,6 +284,7 @@ If matched, you earn 1 Base 🪙.
                 time.sleep(1)
 
                 st.rerun()
+
 
 
 
