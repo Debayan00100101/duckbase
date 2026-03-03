@@ -61,8 +61,9 @@ def create_user(username, pfp):
 
     c.execute("""
     INSERT INTO users(username, balance, pfp, duck_card, duck_coin)
-    VALUES(?, 0, ?, NULL, 0, 0)
+    VALUES(?, 0, ?, 0, 0)
     """, (username, pfp_path))
+
     conn.commit()
 
 def get_user(username):
@@ -283,4 +284,5 @@ If matched, you earn 1 Base 🪙.
                 time.sleep(1)
 
                 st.rerun()
+
 
