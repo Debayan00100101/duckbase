@@ -35,7 +35,6 @@ CREATE TABLE IF NOT EXISTS users(
     username TEXT PRIMARY KEY,
     balance INTEGER DEFAULT 0,
     pfp TEXT,
-    last_play TEXT,
     duck_card INTEGER DEFAULT 0,
     duck_coin INTEGER DEFAULT 0
 )
@@ -61,7 +60,7 @@ def create_user(username, pfp):
         f.write(pfp.getbuffer())
 
     c.execute("""
-    INSERT INTO users(username, balance, pfp, last_play, duck_card, duck_coin)
+    INSERT INTO users(username, balance, pfp, duck_card, duck_coin)
     VALUES(?, 0, ?, NULL, 0, 0)
     """, (username, pfp_path))
     conn.commit()
@@ -94,11 +93,7 @@ def update_balance(username, amount):
 
     conn.commit()
 
-def set_last_play(username):
-    now = datetime.now().isoformat()
-    c.execute("UPDATE users SET last_play=? WHERE username=?",
-              (now, username))
-    conn.commit()
+
 
 def get_weekly_data(username):
     days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
@@ -288,3 +283,4 @@ If matched, you earn 1 Base 🪙.
                 time.sleep(1)
 
                 st.rerun()
+
