@@ -226,18 +226,7 @@ Select number between 0 to 9 and click Start.
 If matched, you earn 1 Base 🪙.
 """)
 
-        if last_play:
-            last_time = datetime.fromisoformat(last_play)
-            next_time = last_time + timedelta(hours=1)
-
-            if datetime.now() < next_time:
-                remaining = next_time - datetime.now()
-                minutes = remaining.seconds // 600
-                st.warning(f"Wait {minutes} minutes.")
-                st.stop()
-
-        selected_number = st.selectbox("Select Number", list(range(10)))
-
+    
         if st.button("Start"):
             result = random.randint(0, 9)
             st.session_state.last_result = result
@@ -297,4 +286,5 @@ If matched, you earn 1 Base 🪙.
             elif result == "success":
                 st.success("Duck Coin Purchased 🪙")
                 time.sleep(1)
+
                 st.rerun()
