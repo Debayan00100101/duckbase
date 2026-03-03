@@ -231,7 +231,7 @@ Select number between 0 to 9 and click Start.
 If matched, you earn 1 Base 🪙.
 """)
 
-        selected_number = st.select_box("Pick a number",list(range(10)))
+        selected_number = st.selectbox("Pick a number",list(range(10)))
         if st.button("Start"):
             result = random.randint(0, 9)
             st.session_state.last_result = result
@@ -240,7 +240,7 @@ If matched, you earn 1 Base 🪙.
 
         if st.session_state.show_result:
 
-            st.markdown(f"## 🎲 Result: {st.session_state.last_result}")
+            st.markdown(f"Result: {st.session_state.last_result}")
 
             if st.session_state.selected_number == st.session_state.last_result:
                 update_balance(username, 1)
@@ -293,6 +293,7 @@ If matched, you earn 1 Base 🪙.
                 time.sleep(1)
 
                 st.rerun()
+
 
 
 
