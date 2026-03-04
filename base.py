@@ -252,7 +252,7 @@ else:
 
         st.header("What's DuckBase🪙?")
         st.markdown("__DuckBase__ is a platform in which you can have a __DuckWallet__ where money is called _base_. You can earn _base_ & buy __DuckEvent__. Currently two events are available, more will come soon...🙂")
-        st.write("__DuckPlot__ is to see every user's __Base__ data to compare with them.")
+        st.write("__DuckPlot__ is to see every user's sample __Base__ data to have an idea about the upcoming real time __DuckPlot__.")
 
     # -------- EARN -------- #
 
@@ -332,3 +332,4 @@ If matched, you earn 1 Base 🪙.
 
 with st.sidebar:
     st.link_button("Discord","https://discord.gg/Wdkq2Fy2")
+
