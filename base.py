@@ -249,7 +249,7 @@ If matched, you earn 1 Base 🪙.
             else:
                 st.error("You lost!")
 
-            set_last_play(username)
+            
 
             time.sleep(3)
             st.session_state.show_result = False
@@ -293,6 +293,7 @@ If matched, you earn 1 Base 🪙.
                 time.sleep(1)
 
                 st.rerun()
+
 
 
 
