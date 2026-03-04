@@ -166,7 +166,6 @@ else:
     duck_card = user[-2]
     duck_coin = user[-1]
 
-    # SIDEBAR
     with st.sidebar:
         st.markdown("## 🪙 Duckbase")
         st.image("Screenshot 2026-03-04 103323.png")
@@ -189,6 +188,7 @@ else:
 
         st.html('<h1 style="font-size:40px;"><b>DuckPlot</b></h1>')
 
+        # 🔥 UPDATED TRADING-STYLE GRAPH 🔥
         fig, ax = plt.subplots()
         fig.patch.set_facecolor("#0e1117")
         ax.set_facecolor("#0e1117")
@@ -203,16 +203,28 @@ else:
             smooth_x = []
             smooth_y = []
 
-            for i in range(len(values)-1):
+            for i in range(len(values) - 1):
                 smooth_x.append(x[i])
                 smooth_y.append(values[i])
 
-                mid_x = x[i] + 0.5
-                mid_y = (values[i] + values[i+1]) / 2 + random.randint(-3, 3)
-                mid_y = max(0, min(50, mid_y))
+                segments = 8  # heavy volatility
 
-                smooth_x.append(mid_x)
-                smooth_y.append(mid_y)
+                for j in range(1, segments):
+                    frac = j / segments
+                    new_x = x[i] + frac
+
+                    trend = values[i] + (values[i+1] - values[i]) * frac
+                    volatility = random.randint(-80, 80)
+
+                    spike = 0
+                    if random.random() < 0.2:
+                        spike = random.randint(-200, 200)
+
+                    new_y = trend + volatility + spike
+                    new_y = max(0, min(1000, new_y))
+
+                    smooth_x.append(new_x)
+                    smooth_y.append(new_y)
 
             smooth_x.append(x[-1])
             smooth_y.append(values[-1])
@@ -224,23 +236,24 @@ else:
 
         ax.set_xticks(range(len(days)))
         ax.set_xticklabels(days)
-
         ax.set_xlabel("Day", color="white")
         ax.set_ylabel("Base Earned", color="white")
-
         ax.set_ylim(0, 1000)
-
         ax.tick_params(colors='white')
 
         for spine in ax.spines.values():
             spine.set_color("white")
 
+        ax.grid(True, linestyle="--", alpha=0.2)
+
         ax.legend(facecolor="#0e1117", edgecolor="white", labelcolor="white")
 
         st.pyplot(fig)
+
         st.header("What's DuckBase🪙?")
         st.markdown("__DuckBase__ is a platform in which you can have a __DuckWallet__ where money is called _base_. You can earn _base_ & buy __DuckEvent__. Currently two events are available, more will come soon...🙂")
         st.write("__DuckPlot__ is to see every user's __Base__ data to compare with them.")
+
     # -------- EARN -------- #
 
     if st.session_state.page == "earn":
@@ -316,21 +329,6 @@ If matched, you earn 1 Base 🪙.
                 st.success("Duck Coin Purchased 🪙")
                 time.sleep(1)
                 st.rerun()
+
 with st.sidebar:
     st.link_button("Discord","https://discord.gg/Wdkq2Fy2")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
