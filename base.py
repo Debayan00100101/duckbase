@@ -316,5 +316,7 @@ If matched, you earn 1 Base 🪙.
                 st.success("Duck Coin Purchased 🪙")
                 time.sleep(1)
                 st.rerun()
+with sidebar:
+    st.link_button("Discord","https://discord.gg/Wdkq2Fy2")
 
 
