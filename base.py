@@ -115,10 +115,10 @@ def buy_item(username, item, price):
     balance = user[1]
 
     # Already purchased
-    if item == "duck_card" and user[4] == 1:
+    if item == "ducksilver" and user[4] == 1:
         return "already"
 
-    if item == "duck_coin" and user[5] == 1:
+    if item == "duckgold" and user[5] == 1:
         return "already"
 
     # Not enough balance
@@ -261,13 +261,14 @@ If matched, you earn 1 Base 🪙.
 
         st.header("Buy Duck Events")
 
-        st.subheader("Duck Card - 🪙10")
+        st.subheader("Duck Coin (Silver) - 🪙10")
 
-        if st.button("Buy Duck Card"):
-            result = buy_item(username, "duck_card", 10)
+        if st.button("Buy Duck Coin"):
+            result = buy_item(username, "ducksilver", 10)
 
             if result == "already":
                 st.info("Already Purchased")
+                
 
             elif result == "insufficient":
                 st.error("Insufficient base!")
@@ -277,22 +278,25 @@ If matched, you earn 1 Base 🪙.
                 time.sleep(1)
                 st.rerun()
 
-        st.subheader("Duck Coin - 🪙50")
+        st.subheader("Duck Coin (Gold)- 🪙50")
 
         if st.button("Buy Duck Coin"):
-            result = buy_item(username, "duck_coin", 50)
+            result = buy_item(username, "duckgold", 50)
 
             if result == "already":
+                st.image("Gemini_Generated_Image_2phh422phh422phh.png")
                 st.info("Already Purchased")
 
             elif result == "insufficient":
                 st.error("Insufficient base!")
 
             elif result == "success":
+                st.image("Gemini_Generated_Image_2phh422phh422phh.png")
                 st.success("Duck Coin Purchased 🪙")
                 time.sleep(1)
 
                 st.rerun()
+
 
 
 
