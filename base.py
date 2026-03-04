@@ -281,6 +281,7 @@ If matched, you earn 1 Base 🪙.
                 update_balance(username, 1)
                 st.balloons()
                 st.success("You won 1 Base 🪙!")
+                st.rerun()
             else:
                 st.error("You lost!")
 
@@ -332,6 +333,7 @@ If matched, you earn 1 Base 🪙.
 
 with st.sidebar:
     st.link_button("Discord","https://discord.gg/Wdkq2Fy2")
+
 
 
 
