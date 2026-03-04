@@ -240,7 +240,7 @@ else:
         st.pyplot(fig)
         st.header("What's DuckBase🪙?")
         st.markdown("__DuckBase__ is a platform in which you can have a __DuckWallet__ where money is called _base_. You can earn _base_ & buy __DuckEvent__. Currently two events are available, more will come soon...🙂")
-
+        st.write("__DuckPlot__ is to see every user's __Base__ data to compare with them.")
     # -------- EARN -------- #
 
     if st.session_state.page == "earn":
@@ -318,6 +318,7 @@ If matched, you earn 1 Base 🪙.
                 st.rerun()
 with st.sidebar:
     st.link_button("Discord","https://discord.gg/Wdkq2Fy2")
+
 
 
 
