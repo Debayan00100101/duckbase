@@ -287,14 +287,14 @@ If matched, you earn 1 Base 🪙.
             result = buy_item(username, "ducksilver", 10)
 
             if result == "already":
-                st.image("Gemini_Generated_Image_xz43glxz43glxz43.png", width=200)
+                st.image("Gemini_Generated_Image_xz43glxz43glxz43.png", width=600)
                 st.info("Already Bought!")
 
             elif result == "insufficient":
                 st.error("Insufficient base!")
 
             elif result == "success":
-                st.image("Gemini_Generated_Image_xz43glxz43glxz43.png", width=200)
+                st.image("Gemini_Generated_Image_xz43glxz43glxz43.png", width=600)
                 st.success("Duck Coin Silver Purchased 🪙")
                 time.sleep(1)
                 st.rerun()
@@ -318,6 +318,7 @@ If matched, you earn 1 Base 🪙.
                 st.rerun()
 with st.sidebar:
     st.link_button("Discord","https://discord.gg/Wdkq2Fy2")
+
 
 
 
