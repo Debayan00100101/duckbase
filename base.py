@@ -27,7 +27,7 @@ h1, h2, h3, h4, h5, h6, p, label {
 
 # -------- DATABASE -------- #
 
-conn = sqlite3.connect("duckbase.db", check_same_thread=False)
+conn = sqlite3.connect("duckbasex.db", check_same_thread=False)
 c = conn.cursor()
 
 c.execute("""
@@ -276,3 +276,4 @@ If matched, you earn 1 Base 🪙.
                 st.success("Duck Coin Purchased 🪙")
                 time.sleep(1)
                 st.rerun()
+
