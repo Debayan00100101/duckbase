@@ -228,7 +228,7 @@ else:
         ax.set_xlabel("Day", color="white")
         ax.set_ylabel("Base Earned", color="white")
 
-        ax.set_ylim(0, 100)
+        ax.set_ylim(0, 1000)
 
         ax.tick_params(colors='white')
 
@@ -318,6 +318,7 @@ If matched, you earn 1 Base 🪙.
                 st.rerun()
 with st.sidebar:
     st.link_button("Discord","https://discord.gg/Wdkq2Fy2")
+
 
 
 
