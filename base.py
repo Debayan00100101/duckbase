@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS users(
     username TEXT PRIMARY KEY,
     balance INTEGER DEFAULT 0,
     pfp TEXT,
-    duck_card INTEGER DEFAULT 0,
-    duck_coin INTEGER DEFAULT 0
+    ducksilver INTEGER DEFAULT 0,
+    duckgold INTEGER DEFAULT 0
 )
 """)
 
@@ -60,7 +60,7 @@ def create_user(username, pfp):
         f.write(pfp.getbuffer())
 
     c.execute("""
-    INSERT INTO users(username, balance, pfp, duck_card, duck_coin)
+    INSERT INTO users(username, balance, pfp, ducksilver, duckgold)
     VALUES(?, 0, ?, 0, 0)
     """, (username, pfp_path))
 
@@ -126,12 +126,12 @@ def buy_item(username, item, price):
         return "insufficient"
 
     # Purchase
-    if item == "duck_card":
-        c.execute("UPDATE users SET duck_card=1, balance=balance-? WHERE username=?",
+    if item == "ducksilver":
+        c.execute("UPDATE users SET ducksilver=1, balance=balance-? WHERE username=?",
                   (price, username))
 
-    if item == "duck_coin":
-        c.execute("UPDATE users SET duck_coin=1, balance=balance-? WHERE username=?",
+    if item == "duckgold":
+        c.execute("UPDATE users SET duckgold=1, balance=balance-? WHERE username=?",
                   (price, username))
 
     conn.commit()
@@ -296,6 +296,7 @@ If matched, you earn 1 Base 🪙.
                 time.sleep(1)
 
                 st.rerun()
+
 
 
 
