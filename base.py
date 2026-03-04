@@ -247,7 +247,7 @@ If matched, you earn 1 Base 🪙.
 
         st.subheader("Duck Coin (Silver) - 🪙10")
 
-        if st.button("Buy Duck Coin"):
+        if st.button("Buy Duck Coin", key="buy_silver"):
             result = buy_item(username, "ducksilver", 10)
 
             if result == "already":
@@ -263,7 +263,7 @@ If matched, you earn 1 Base 🪙.
 
         st.subheader("Duck Coin (Gold)- 🪙50")
 
-        if st.button("Buy Duck Coin"):
+        if st.button("Buy Duck Coin", key="buy_gold"):
             result = buy_item(username, "duckgold", 50)
 
             if result == "already":
@@ -276,4 +276,3 @@ If matched, you earn 1 Base 🪙.
                 st.success("Duck Coin Purchased 🪙")
                 time.sleep(1)
                 st.rerun()
-
