@@ -187,7 +187,7 @@ else:
 
         st.markdown(f"# 🪙 {balance}")
 
-        st.html('<h1 style="font-size:30px;"><center><b>DuckPlot</b></center></h1>')
+        st.html('<h1 style="font-size:40px;"><center><b>DuckPlot</b></center></h1>')
 
         fig, ax = plt.subplots()
         fig.patch.set_facecolor("#0e1117")
@@ -318,6 +318,7 @@ If matched, you earn 1 Base 🪙.
                 st.rerun()
 with st.sidebar:
     st.link_button("Discord","https://discord.gg/Wdkq2Fy2")
+
 
 
 
