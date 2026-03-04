@@ -257,7 +257,7 @@ If matched, you earn 1 Base 🪙.
                 st.error("Insufficient base!")
 
             elif result == "success":
-                st.success("Duck Card Purchased 🪙")
+                st.success("Duck Coin Silver Purchased 🪙")
                 time.sleep(1)
                 st.rerun()
 
@@ -267,12 +267,15 @@ If matched, you earn 1 Base 🪙.
             result = buy_item(username, "duckgold", 50)
 
             if result == "already":
+                st.image("Gemini_Generated_Image_2phh422phh422phh.png")
                 st.info("Already Purchased")
 
             elif result == "insufficient":
                 st.error("Insufficient base!")
 
             elif result == "success":
+                st.image("Gemini_Generated_Image_2phh422phh422phh.png")
                 st.success("Duck Coin Purchased 🪙")
                 time.sleep(1)
                 st.rerun()
+
