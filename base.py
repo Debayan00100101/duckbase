@@ -136,6 +136,10 @@ if "page" not in st.session_state:
 if "show_result" not in st.session_state:
     st.session_state.show_result = False
 
+# ✅ NEW: cooldown session
+if "cooldown_until" not in st.session_state:
+    st.session_state.cooldown_until = None
+
 # -------- LOGIN -------- #
 
 if not st.session_state.user:
@@ -188,7 +192,6 @@ else:
 
         st.html('<h1 style="font-size:40px;"><b>DuckPlot</b></h1>')
 
-        # 🔥 UPDATED TRADING-STYLE GRAPH 🔥
         fig, ax = plt.subplots()
         fig.patch.set_facecolor("#0e1117")
         ax.set_facecolor("#0e1117")
@@ -207,7 +210,7 @@ else:
                 smooth_x.append(x[i])
                 smooth_y.append(values[i])
 
-                segments = 8  # heavy volatility
+                segments = 8
 
                 for j in range(1, segments):
                     frac = j / segments
@@ -245,7 +248,6 @@ else:
             spine.set_color("white")
 
         ax.grid(True, linestyle="--", alpha=0.2)
-
         ax.legend(facecolor="#0e1117", edgecolor="white", labelcolor="white")
 
         st.pyplot(fig)
@@ -267,11 +269,25 @@ If matched, you earn 1 Base 🪙.
 
         selected_number = st.selectbox("Pick a number", list(range(10)))
 
+        # ✅ COOLDOWN CHECK
+        now = datetime.now()
+
+        if st.session_state.cooldown_until:
+            remaining = (st.session_state.cooldown_until - now).total_seconds()
+            if remaining > 0:
+                st.warning(f"⏳ Wait {int(remaining)} seconds before next try.")
+                st.stop()
+            else:
+                st.session_state.cooldown_until = None
+
         if st.button("Start"):
             result = random.randint(0, 9)
             st.session_state.last_result = result
             st.session_state.selected_number = selected_number
             st.session_state.show_result = True
+
+            # ✅ Set 1 minute cooldown
+            st.session_state.cooldown_until = datetime.now() + timedelta(minutes=1)
 
         if st.session_state.show_result:
 
@@ -333,8 +349,3 @@ If matched, you earn 1 Base 🪙.
 
 with st.sidebar:
     st.link_button("Discord","https://discord.gg/Wdkq2Fy2")
-
-
-
-
-
