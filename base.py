@@ -193,22 +193,42 @@ else:
         fig.patch.set_facecolor("#0e1117")
         ax.set_facecolor("#0e1117")
 
-        # Get all users
         c.execute("SELECT username FROM users")
         all_users = [u[0] for u in c.fetchall()]
 
         for u in all_users:
             days, values = get_weekly_data(u)
 
+            x = list(range(len(days)))
+            smooth_x = []
+            smooth_y = []
+
+            for i in range(len(values)-1):
+                smooth_x.append(x[i])
+                smooth_y.append(values[i])
+
+                mid_x = x[i] + 0.5
+                mid_y = (values[i] + values[i+1]) / 2 + random.randint(-3, 3)
+                mid_y = max(0, min(50, mid_y))
+
+                smooth_x.append(mid_x)
+                smooth_y.append(mid_y)
+
+            smooth_x.append(x[-1])
+            smooth_y.append(values[-1])
+
             total = sum(values)
             color = "#00ff88" if total >= 0 else "#ff4b4b"
 
-            ax.plot(days, values, marker="o", linewidth=2, label=u, color=color)
+            ax.plot(smooth_x, smooth_y, linewidth=2, label=u, color=color)
+
+        ax.set_xticks(range(len(days)))
+        ax.set_xticklabels(days)
 
         ax.set_xlabel("Day", color="white")
         ax.set_ylabel("Base Earned", color="white")
 
-        ax.set_ylim(0, 50)  # Range fixed to 50
+        ax.set_ylim(0, 50)
 
         ax.tick_params(colors='white')
 
