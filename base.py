@@ -238,7 +238,7 @@ else:
         ax.set_xticklabels(days)
         ax.set_xlabel("Day", color="white")
         ax.set_ylabel("Base Cost Rate", color="white")
-        ax.set_ylim(0, 10000)
+        ax.set_ylim(0, 5000)
         ax.tick_params(colors='white')
 
         for spine in ax.spines.values():
@@ -332,5 +332,6 @@ If matched, you earn 1 Base 🪙.
 
 with st.sidebar:
     st.link_button("Discord","https://discord.gg/Wdkq2Fy2")
+
 
 
