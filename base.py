@@ -238,6 +238,8 @@ else:
         ax.legend(facecolor="#0e1117", edgecolor="white", labelcolor="white")
 
         st.pyplot(fig)
+        st.header("What's DuckBase🪙?")
+    st.markdown("__DuckBase__ is a platform in which you can have a __DuckWallet__ where money is called _base_. You can earn _base_ & buy __DuckEvent__. Currently two events are available, more will come soon...🙂")
 
     # -------- EARN -------- #
 
@@ -315,9 +317,4 @@ If matched, you earn 1 Base 🪙.
                 time.sleep(1)
                 st.rerun()
 
-with st.sidebar:
-    b=st.button("Base")
-if b:
-    st.header("What's DuckBase🪙?")
-    st.markdown("__DuckBase__ is a platform in which you can have a __DuckWallet__ where money is called _base_. You can earn _base_ & buy __DuckEvent__. Currently two events are available, more will come soon...🙂")
 
