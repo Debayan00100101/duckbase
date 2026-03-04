@@ -187,22 +187,35 @@ else:
 
         st.markdown(f"# 🪙 {balance}")
 
-        st.subheader("Base Over Time")
-
-        days, values = get_weekly_data(username)
+        st.subheader("Base Fluctuation (All Users)")
 
         fig, ax = plt.subplots()
         fig.patch.set_facecolor("#0e1117")
         ax.set_facecolor("#0e1117")
 
-        ax.plot(days, values)
+        # Get all users
+        c.execute("SELECT username FROM users")
+        all_users = [u[0] for u in c.fetchall()]
+
+        for u in all_users:
+            days, values = get_weekly_data(u)
+
+            total = sum(values)
+            color = "#00ff88" if total >= 0 else "#ff4b4b"
+
+            ax.plot(days, values, marker="o", linewidth=2, label=u, color=color)
+
         ax.set_xlabel("Day", color="white")
         ax.set_ylabel("Base Earned", color="white")
+
+        ax.set_ylim(0, 50)  # Range fixed to 50
 
         ax.tick_params(colors='white')
 
         for spine in ax.spines.values():
             spine.set_color("white")
+
+        ax.legend(facecolor="#0e1117", edgecolor="white", labelcolor="white")
 
         st.pyplot(fig)
 
@@ -281,6 +294,3 @@ If matched, you earn 1 Base 🪙.
                 st.success("Duck Coin Purchased 🪙")
                 time.sleep(1)
                 st.rerun()
-
-
-
