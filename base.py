@@ -34,7 +34,6 @@ c.execute("""
 CREATE TABLE IF NOT EXISTS users(
     username TEXT PRIMARY KEY,
     balance INTEGER DEFAULT 0,
-    pfp TEXT,
     ducksilver INTEGER DEFAULT 0,
     duckgold INTEGER DEFAULT 0
 )
@@ -52,18 +51,11 @@ conn.commit()
 
 # -------- FUNCTIONS -------- #
 
-def create_user(username, pfp):
-    os.makedirs("pfps", exist_ok=True)
-    pfp_path = f"pfps/{username}.png"
-
-    with open(pfp_path, "wb") as f:
-        f.write(pfp.getbuffer())
-
+def create_user(username):
     c.execute("""
-    INSERT INTO users(username, balance, pfp, ducksilver, duckgold)
-    VALUES(?, 0, ?, 0, 0)
-    """, (username, pfp_path))
-
+    INSERT INTO users(username, balance, ducksilver, duckgold)
+    VALUES(?, 0, 0, 0)
+    """, (username,))
     conn.commit()
 
 def get_user(username):
@@ -95,7 +87,6 @@ def update_balance(username, amount):
     conn.commit()
 
 
-
 def get_weekly_data(username):
     days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
     values = [0]*7
@@ -114,18 +105,15 @@ def buy_item(username, item, price):
     user = get_user(username)
     balance = user[1]
 
-    # Already purchased
-    if item == "ducksilver" and user[4] == 1:
+    if item == "ducksilver" and user[2] == 1:
         return "already"
 
-    if item == "duckgold" and user[5] == 1:
+    if item == "duckgold" and user[3] == 1:
         return "already"
 
-    # Not enough balance
     if balance < price:
         return "insufficient"
 
-    # Purchase
     if item == "ducksilver":
         c.execute("UPDATE users SET ducksilver=1, balance=balance-? WHERE username=?",
                   (price, username))
@@ -155,12 +143,11 @@ if not st.session_state.user:
     st.title("🪙 Duckbase")
 
     username = st.text_input("Set Username")
-    pfp = st.file_uploader("Upload Profile Picture", type=["png","jpg","jpeg"])
 
     if st.button("Start"):
-        if username and pfp:
+        if username:
             if not get_user(username):
-                create_user(username, pfp)
+                create_user(username)
 
             st.session_state.user = username
             st.rerun()
@@ -176,14 +163,12 @@ else:
 
     username = user[0]
     balance = user[1]
-    pfp_path = user[2]
     duck_card = user[-2]
     duck_coin = user[-1]
 
     # SIDEBAR
     with st.sidebar:
         st.markdown("## 🪙 Duckbase")
-        st.image(pfp_path, width=120)
         st.write(username)
 
         if st.button("Home"):
@@ -231,7 +216,8 @@ Select number between 0 to 9 and click Start.
 If matched, you earn 1 Base 🪙.
 """)
 
-        selected_number = st.selectbox("Pick a number",list(range(10)))
+        selected_number = st.selectbox("Pick a number", list(range(10)))
+
         if st.button("Start"):
             result = random.randint(0, 9)
             st.session_state.last_result = result
@@ -248,8 +234,6 @@ If matched, you earn 1 Base 🪙.
                 st.success("You won 1 Base 🪙!")
             else:
                 st.error("You lost!")
-
-            
 
             time.sleep(3)
             st.session_state.show_result = False
@@ -268,7 +252,6 @@ If matched, you earn 1 Base 🪙.
 
             if result == "already":
                 st.info("Already Purchased")
-                
 
             elif result == "insufficient":
                 st.error("Insufficient base!")
@@ -284,26 +267,12 @@ If matched, you earn 1 Base 🪙.
             result = buy_item(username, "duckgold", 50)
 
             if result == "already":
-                st.image("Gemini_Generated_Image_2phh422phh422phh.png")
                 st.info("Already Purchased")
 
             elif result == "insufficient":
                 st.error("Insufficient base!")
 
             elif result == "success":
-                st.image("Gemini_Generated_Image_2phh422phh422phh.png")
                 st.success("Duck Coin Purchased 🪙")
                 time.sleep(1)
-
                 st.rerun()
-
-
-
-
-
-
-
-
-
-
-
