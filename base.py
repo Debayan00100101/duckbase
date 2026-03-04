@@ -187,7 +187,7 @@ else:
 
         st.markdown(f"# 🪙 {balance}")
 
-        st.subheader("Base Fluctuation (All Users)")
+        st.subheader("__DuckPlot__")
 
         fig, ax = plt.subplots()
         fig.patch.set_facecolor("#0e1117")
@@ -318,6 +318,7 @@ If matched, you earn 1 Base 🪙.
                 st.rerun()
 with st.sidebar:
     st.link_button("Discord","https://discord.gg/Wdkq2Fy2")
+
 
 
 
