@@ -169,6 +169,7 @@ else:
     # SIDEBAR
     with st.sidebar:
         st.markdown("## 🪙 Duckbase")
+        st.image("Screenshot 2026-03-04 103323.png")
         st.write(username)
 
         if st.button("Home"):
@@ -280,5 +281,6 @@ If matched, you earn 1 Base 🪙.
                 st.success("Duck Coin Purchased 🪙")
                 time.sleep(1)
                 st.rerun()
+
 
 
