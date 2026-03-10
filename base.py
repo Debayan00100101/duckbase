@@ -86,15 +86,17 @@ def update_market():
 # -------- FUNCTIONS -------- #
 
 def create_user(username):
-    c.execute("""
-    INSERT INTO users(username, balance)
-    VALUES(?, 5)
-    """, (username,))
+    c.execute("INSERT INTO users(username, balance) VALUES(?,5)", (username,))
     conn.commit()
 
 def get_user(username):
     c.execute("SELECT * FROM users WHERE username=?", (username,))
     return c.fetchone()
+
+def delete_user(username):
+    c.execute("DELETE FROM users WHERE username=?", (username,))
+    c.execute("DELETE FROM earnings WHERE username=?", (username,))
+    conn.commit()
 
 def update_balance(username, amount):
 
@@ -120,22 +122,6 @@ def update_balance(username, amount):
         """, (username, today, amount))
 
     conn.commit()
-
-
-def get_weekly_data(username):
-
-    days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
-    values = [0]*7
-
-    c.execute("SELECT date, amount FROM earnings WHERE username=?", (username,))
-    rows = c.fetchall()
-
-    for date_str, amount in rows:
-        d = datetime.fromisoformat(date_str)
-        idx = (d.weekday() + 1) % 7
-        values[idx] += amount
-
-    return days, values
 
 # -------- SESSION -------- #
 
@@ -180,6 +166,7 @@ else:
     balance = user[1]
 
     with st.sidebar:
+
         st.markdown("## 🪙 Duckbase")
         st.image("Screenshot 2026-03-04 103323.png")
         st.write(username)
@@ -189,6 +176,9 @@ else:
 
         if st.button("Earn DC"):
             st.session_state.page = "earn"
+
+        if st.button("Delete Account"):
+            st.session_state.page = "delete"
 
     # -------- HOME -------- #
 
@@ -215,7 +205,8 @@ else:
                 increasing_line_color="#26a69a",
                 decreasing_line_color="#ef5350",
                 increasing_fillcolor="#26a69a",
-                decreasing_fillcolor="#ef5350"
+                decreasing_fillcolor="#ef5350",
+                whiskerwidth=1.5
             ))
 
             fig.add_trace(go.Bar(
@@ -234,18 +225,11 @@ else:
                 showlegend=False,
                 font=dict(color="#d1d4dc"),
                 margin=dict(l=10,r=10,t=10,b=10),
-                yaxis=dict(range=[0,100])  # MAX VALUE 100
+                yaxis=dict(range=[0,100])
             )
 
-            fig.update_xaxes(
-                showgrid=True,
-                gridcolor="#1f2933"
-            )
-
-            fig.update_yaxes(
-                showgrid=True,
-                gridcolor="#1f2933"
-            )
+            fig.update_xaxes(showgrid=True, gridcolor="#1f2933")
+            fig.update_yaxes(showgrid=True, gridcolor="#1f2933")
 
             st.plotly_chart(fig, use_container_width=True)
 
@@ -302,6 +286,20 @@ If matched, you earn **1 DC**.
 
             time.sleep(3)
             st.session_state.show_result = False
+            st.rerun()
+
+    # -------- DELETE ACCOUNT -------- #
+
+    if st.session_state.page == "delete":
+
+        st.header("Delete Account")
+
+        st.warning("This action cannot be undone.")
+
+        if st.button("Confirm Delete Account"):
+            delete_user(username)
+            st.session_state.user = None
+            st.success("Account deleted.")
             st.rerun()
 
 with st.sidebar:
