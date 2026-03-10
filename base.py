@@ -33,9 +33,8 @@ c = conn.cursor()
 c.execute("""
 CREATE TABLE IF NOT EXISTS users(
     username TEXT PRIMARY KEY,
-    balance INTEGER DEFAULT 0,
-    ducksilver INTEGER DEFAULT 0,
-    duckgold INTEGER DEFAULT 0
+    balance REAL DEFAULT 0,
+    dc REAL DEFAULT 0
 )
 """)
 
@@ -43,19 +42,41 @@ c.execute("""
 CREATE TABLE IF NOT EXISTS earnings(
     username TEXT,
     date TEXT,
-    amount INTEGER
+    amount REAL
+)
+""")
+
+c.execute("""
+CREATE TABLE IF NOT EXISTS trades(
+    username TEXT,
+    type TEXT,
+    price REAL,
+    amount REAL,
+    time TEXT
 )
 """)
 
 conn.commit()
 
+# -------- MARKET -------- #
+
+if "dc_price" not in st.session_state:
+    st.session_state.dc_price = 1.0
+
+def update_market():
+    change = random.uniform(-0.05,0.05)
+    st.session_state.dc_price += change
+
+    if st.session_state.dc_price < 0.1:
+        st.session_state.dc_price = 0.1
+
 # -------- FUNCTIONS -------- #
 
 def create_user(username):
     c.execute("""
-    INSERT INTO users(username, balance, ducksilver, duckgold)
-    VALUES(?, 0, 0, 0)
-    """, (username,))
+    INSERT INTO users(username, balance, dc)
+    VALUES(?,0,0)
+    """,(username,))
     conn.commit()
 
 def get_user(username):
@@ -63,6 +84,7 @@ def get_user(username):
     return c.fetchone()
 
 def update_balance(username, amount):
+
     c.execute("UPDATE users SET balance = balance + ? WHERE username=?",
               (amount, username))
     conn.commit()
@@ -88,6 +110,7 @@ def update_balance(username, amount):
 
 
 def get_weekly_data(username):
+
     days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
     values = [0]*7
 
@@ -101,30 +124,6 @@ def get_weekly_data(username):
 
     return days, values
 
-def buy_item(username, item, price):
-    user = get_user(username)
-    balance = user[1]
-
-    if item == "ducksilver" and user[2] == 1:
-        return "already"
-
-    if item == "duckgold" and user[3] == 1:
-        return "already"
-
-    if balance < price:
-        return "insufficient"
-
-    if item == "ducksilver":
-        c.execute("UPDATE users SET ducksilver=1, balance=balance-? WHERE username=?",
-                  (price, username))
-
-    if item == "duckgold":
-        c.execute("UPDATE users SET duckgold=1, balance=balance-? WHERE username=?",
-                  (price, username))
-
-    conn.commit()
-    return "success"
-
 # -------- SESSION -------- #
 
 if "user" not in st.session_state:
@@ -136,7 +135,6 @@ if "page" not in st.session_state:
 if "show_result" not in st.session_state:
     st.session_state.show_result = False
 
-# ✅ NEW: cooldown session
 if "cooldown_until" not in st.session_state:
     st.session_state.cooldown_until = None
 
@@ -159,6 +157,7 @@ if not st.session_state.user:
 # -------- MAIN APP -------- #
 
 else:
+
     user = get_user(st.session_state.user)
 
     if not user:
@@ -167,10 +166,10 @@ else:
 
     username = user[0]
     balance = user[1]
-    duck_card = user[-2]
-    duck_coin = user[-1]
+    dc = user[2]
 
     with st.sidebar:
+
         st.markdown("## 🪙 Duckbase")
         st.image("Screenshot 2026-03-04 103323.png")
         st.write(username)
@@ -178,17 +177,20 @@ else:
         if st.button("Home"):
             st.session_state.page = "home"
 
-        if st.button("Earn Base"):
+        if st.button("Earn DC"):
             st.session_state.page = "earn"
 
-        if st.button("Buy Duck Events"):
-            st.session_state.page = "buy"
+        if st.button("Trading"):
+            st.session_state.page = "trade"
+
+        if st.button("Live Market"):
+            st.session_state.page = "market"
 
     # -------- HOME -------- #
 
     if st.session_state.page == "home":
 
-        st.markdown(f"# 🪙 {balance}")
+        st.markdown(f"# 🪙 {balance} DC")
 
         st.html('<h1 style="font-size:40px;"><b>DuckPlot</b></h1>')
 
@@ -200,80 +202,53 @@ else:
         all_users = [u[0] for u in c.fetchall()]
 
         for u in all_users:
+
             days, values = get_weekly_data(u)
 
-            x = list(range(len(days)))
-            smooth_x = []
-            smooth_y = []
+            ax.plot(days, values, linewidth=2, label=u)
 
-            for i in range(len(values) - 1):
-                smooth_x.append(x[i])
-                smooth_y.append(values[i])
-
-                segments = 8
-
-                for j in range(1, segments):
-                    frac = j / segments
-                    new_x = x[i] + frac
-
-                    trend = values[i] + (values[i+1] - values[i]) * frac
-                    volatility = random.randint(-80, 80)
-
-                    spike = 0
-                    if random.random() < 0.2:
-                        spike = random.randint(-200, 200)
-
-                    new_y = trend + volatility + spike
-                    new_y = max(0, min(1000, new_y))
-
-                    smooth_x.append(new_x)
-                    smooth_y.append(new_y)
-
-            smooth_x.append(x[-1])
-            smooth_y.append(values[-1])
-
-            total = sum(values)
-            color = "#00ff88" if total >= 0 else "#ff4b4b"
-
-            ax.plot(smooth_x, smooth_y, linewidth=2, label=u, color=color)
-
-        ax.set_xticks(range(len(days)))
-        ax.set_xticklabels(days)
-        ax.set_xlabel("Day", color="white")
-        ax.set_ylabel("Base Cost Rate", color="white")
-        ax.set_ylim(0, 2000)
         ax.tick_params(colors='white')
 
         for spine in ax.spines.values():
             spine.set_color("white")
 
-        ax.grid(True, linestyle="--", alpha=0.2)
         ax.legend(facecolor="#0e1117", edgecolor="white", labelcolor="white")
 
         st.pyplot(fig)
 
-        st.header("What's DuckBase🪙?")
-        st.markdown("__DuckBase__ is a platform in which you can have a __DuckWallet__ where money is called _base_. You can earn _base_ & buy __DuckEvent__. Currently two events are available, more will come soon...🙂")
-        st.write("__DuckPlot__ is to see every user's sample __Base__ data to have an idea about the upcoming real time __DuckPlot__.")
+        st.header("What's Duckbase Coin (DC)?")
+
+        st.markdown("""
+Duckbase Coin (DC) is the main currency of Duckbase.
+
+You can:
+
+• Earn DC  
+• Trade DC  
+• Watch the live market  
+
+The market is controlled by the built-in trading bot **DuckAI**.
+""")
 
     # -------- EARN -------- #
 
     if st.session_state.page == "earn":
 
-        st.header("Earn Base")
+        st.header("Earn Duckbase Coin (DC)")
 
         st.markdown("""
 Select number between 0 to 9 and click Start.  
-If matched, you earn 1 Base 🪙.
+If matched, you earn **1 DC**.
 """)
 
         selected_number = st.selectbox("Pick a number", list(range(10)))
 
-        # ✅ COOLDOWN CHECK
         now = datetime.now()
 
         if st.session_state.cooldown_until:
+
             remaining = (st.session_state.cooldown_until - now).total_seconds()
+
             if remaining > 0:
                 st.warning(f"⏳ Wait {int(remaining)} seconds before next try.")
                 st.stop()
@@ -281,12 +256,13 @@ If matched, you earn 1 Base 🪙.
                 st.session_state.cooldown_until = None
 
         if st.button("Start"):
+
             result = random.randint(0, 9)
+
             st.session_state.last_result = result
             st.session_state.selected_number = selected_number
             st.session_state.show_result = True
 
-            # ✅ Set 1 minute cooldown
             st.session_state.cooldown_until = datetime.now() + timedelta(minutes=1)
 
         if st.session_state.show_result:
@@ -294,58 +270,111 @@ If matched, you earn 1 Base 🪙.
             st.markdown(f"Result: {st.session_state.last_result}")
 
             if st.session_state.selected_number == st.session_state.last_result:
+
                 update_balance(username, 1)
+
                 st.balloons()
-                st.success("You won 1 Base 🪙!")
+                st.success("You won 1 DC!")
                 st.rerun()
+
             else:
                 st.error("You lost!")
 
             time.sleep(3)
+
             st.session_state.show_result = False
             st.rerun()
 
-    # -------- BUY -------- #
+    # -------- TRADING -------- #
 
-    if st.session_state.page == "buy":
+    if st.session_state.page == "trade":
 
-        st.header("Buy Duck Events")
+        st.header("Duckbase Exchange")
 
-        st.subheader("Duck Coin (Silver) - 🪙10")
+        update_market()
 
-        if st.button("Buy Duck Coin", key="buy_silver"):
-            result = buy_item(username, "ducksilver", 10)
+        price = st.session_state.dc_price
 
-            if result == "already":
-                st.image("Gemini_Generated_Image_xz43glxz43glxz43.png")
-                st.info("Already Bought!")
+        st.subheader(f"Current DC Price: ${round(price,3)}")
 
-            elif result == "insufficient":
-                st.error("Insufficient base!")
+        amount = st.number_input("Amount",1,100,1)
 
-            elif result == "success":
-                st.image("Gemini_Generated_Image_xz43glxz43glxz43.png")
-                st.success("Duck Coin Silver Purchased 🪙")
-                time.sleep(1)
+        if st.button("Buy DC"):
+
+            cost = price * amount
+
+            if balance >= cost:
+
+                c.execute("UPDATE users SET balance=balance-?, dc=dc+? WHERE username=?",
+                          (cost, amount, username))
+                conn.commit()
+
+                st.success("DuckAI sold DC to you 🪙")
+
+                c.execute("INSERT INTO trades VALUES(?,?,?,?,?)",
+                          (username,"BUY",price,amount,str(datetime.now())))
+                conn.commit()
+
                 st.rerun()
 
-        st.subheader("Duck Coin (Gold)- 🪙50")
+            else:
+                st.error("Not enough DC balance")
 
-        if st.button("Buy Duck Coin", key="buy_gold"):
-            result = buy_item(username, "duckgold", 50)
+        if st.button("Sell DC"):
 
-            if result == "already":
-                st.image("Gemini_Generated_Image_2phh422phh422phh.png")
-                st.info("Already Bought!")
+            if dc >= amount:
 
-            elif result == "insufficient":
-                st.error("Insufficient base!")
+                gain = price * amount
 
-            elif result == "success":
-                st.image("Gemini_Generated_Image_2phh422phh422phh.png")
-                st.success("Duck Coin Purchased 🪙")
-                time.sleep(1)
+                c.execute("UPDATE users SET balance=balance+?, dc=dc-? WHERE username=?",
+                          (gain, amount, username))
+                conn.commit()
+
+                st.success("DuckAI bought DC from you 🪙")
+
+                c.execute("INSERT INTO trades VALUES(?,?,?,?,?)",
+                          (username,"SELL",price,amount,str(datetime.now())))
+                conn.commit()
+
                 st.rerun()
+
+            else:
+                st.error("You don't have enough DC")
+
+    # -------- LIVE CANDLE MARKET -------- #
+
+    if st.session_state.page == "market":
+
+        st.header("Live Duckbase Market")
+
+        prices=[]
+        base=st.session_state.dc_price
+
+        for i in range(30):
+
+            open_p=base+random.uniform(-0.05,0.05)
+            close_p=open_p+random.uniform(-0.05,0.05)
+            high=max(open_p,close_p)+random.uniform(0,0.05)
+            low=min(open_p,close_p)-random.uniform(0,0.05)
+
+            prices.append([open_p,high,low,close_p])
+            base=close_p
+
+        fig,ax=plt.subplots()
+
+        for i,p in enumerate(prices):
+
+            o,h,l,c=p
+            color="green" if c>o else "red"
+
+            ax.plot([i,i],[l,h],color=color)
+            ax.plot([i,i],[o,c],linewidth=6,color=color)
+
+        fig.patch.set_facecolor("#0e1117")
+        ax.set_facecolor("#0e1117")
+        ax.tick_params(colors='white')
+
+        st.pyplot(fig)
 
 with st.sidebar:
     st.link_button("Discord","https://discord.gg/Wdkq2Fy2")
