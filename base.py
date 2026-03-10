@@ -88,7 +88,7 @@ def update_market():
 def create_user(username):
     c.execute("""
     INSERT INTO users(username, balance)
-    VALUES(?, 0)
+    VALUES(?, 5)
     """, (username,))
     conn.commit()
 
@@ -233,7 +233,8 @@ else:
                 xaxis_rangeslider_visible=False,
                 showlegend=False,
                 font=dict(color="#d1d4dc"),
-                margin=dict(l=10,r=10,t=10,b=10)
+                margin=dict(l=10,r=10,t=10,b=10),
+                yaxis=dict(range=[0,100])  # MAX VALUE 100
             )
 
             fig.update_xaxes(
