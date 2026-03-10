@@ -205,8 +205,7 @@ else:
                 increasing_line_color="#26a69a",
                 decreasing_line_color="#ef5350",
                 increasing_fillcolor="#26a69a",
-                decreasing_fillcolor="#ef5350",
-                whiskerwidth=1.5
+                decreasing_fillcolor="#ef5350"
             ))
 
             fig.add_trace(go.Bar(
@@ -225,7 +224,8 @@ else:
                 showlegend=False,
                 font=dict(color="#d1d4dc"),
                 margin=dict(l=10,r=10,t=10,b=10),
-                yaxis=dict(range=[0,100])
+                yaxis=dict(range=[0,100]),
+                bargap=0.05
             )
 
             fig.update_xaxes(showgrid=True, gridcolor="#1f2933")
@@ -293,7 +293,6 @@ If matched, you earn **1 DC**.
     if st.session_state.page == "delete":
 
         st.header("Delete Account")
-
         st.warning("This action cannot be undone.")
 
         if st.button("Confirm Delete Account"):
