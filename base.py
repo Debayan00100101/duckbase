@@ -137,6 +137,9 @@ if "show_result" not in st.session_state:
 if "cooldown_until" not in st.session_state:
     st.session_state.cooldown_until = None
 
+if "first_offer" not in st.session_state:
+    st.session_state.first_offer = False
+
 # -------- LOGIN -------- #
 
 if not st.session_state.user:
@@ -149,6 +152,7 @@ if not st.session_state.user:
         if username:
             if not get_user(username):
                 create_user(username)
+                st.session_state.first_offer = True
 
             st.session_state.user = username
             st.rerun()
@@ -164,6 +168,15 @@ else:
 
     username = user[0]
     balance = user[1]
+
+    # -------- FIRST OFFER MESSAGE -------- #
+
+    if st.session_state.first_offer:
+        st.balloons()
+        st.success("You've got the first income to start trading")
+        time.sleep(3)
+        st.session_state.first_offer = False
+        st.rerun()
 
     with st.sidebar:
 
