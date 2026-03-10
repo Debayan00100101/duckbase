@@ -15,7 +15,7 @@ st.set_page_config(page_title="Duckbase", page_icon="🪙")
 st.markdown("""
 <style>
 .stApp {
-    background-color: #0e1117;
+    background-color: #0b0f14;
     color: white;
 }
 div[data-testid="stSidebar"] {
@@ -63,8 +63,11 @@ def update_market():
 
     open_p = last
     close_p = open_p + random.uniform(-0.05,0.05)
-    high = max(open_p,close_p) + random.uniform(0,0.03)
-    low = min(open_p,close_p) - random.uniform(0,0.03)
+
+    high = max(open_p,close_p) + random.uniform(0,0.02)
+    low = min(open_p,close_p) - random.uniform(0,0.02)
+
+    volume = random.randint(200,1200)
 
     st.session_state.dc_price = close_p
 
@@ -73,7 +76,8 @@ def update_market():
         "open": open_p,
         "high": high,
         "low": low,
-        "close": close_p
+        "close": close_p,
+        "volume": volume
     })
 
     if len(st.session_state.candles) > 120:
@@ -116,6 +120,7 @@ def update_balance(username, amount):
         """, (username, today, amount))
 
     conn.commit()
+
 
 def get_weekly_data(username):
 
@@ -165,7 +170,6 @@ if not st.session_state.user:
 # -------- MAIN APP -------- #
 
 else:
-
     user = get_user(st.session_state.user)
 
     if not user:
@@ -176,7 +180,6 @@ else:
     balance = user[1]
 
     with st.sidebar:
-
         st.markdown("## 🪙 Duckbase")
         st.image("Screenshot 2026-03-04 103323.png")
         st.write(username)
@@ -201,46 +204,66 @@ else:
 
         if len(df) > 2:
 
-            fig = go.Figure(data=[go.Candlestick(
+            fig = go.Figure()
+
+            fig.add_trace(go.Candlestick(
                 x=df["time"],
                 open=df["open"],
                 high=df["high"],
                 low=df["low"],
                 close=df["close"],
-                increasing_line_color="#00ff9f",
-                decreasing_line_color="#ff4d4d",
-                increasing_fillcolor="#00ff9f",
-                decreasing_fillcolor="#ff4d4d"
-            )])
+                increasing_line_color="#26a69a",
+                decreasing_line_color="#ef5350",
+                increasing_fillcolor="#26a69a",
+                decreasing_fillcolor="#ef5350"
+            ))
+
+            fig.add_trace(go.Bar(
+                x=df["time"],
+                y=df["volume"],
+                marker_color="#444",
+                opacity=0.35
+            ))
 
             fig.update_layout(
                 template="plotly_dark",
-                paper_bgcolor="#0e1117",
-                plot_bgcolor="#0e1117",
-                height=500,
+                paper_bgcolor="#0b0f14",
+                plot_bgcolor="#0b0f14",
+                height=550,
                 xaxis_rangeslider_visible=False,
-                font=dict(color="white")
+                showlegend=False,
+                font=dict(color="#d1d4dc"),
+                margin=dict(l=10,r=10,t=10,b=10)
+            )
+
+            fig.update_xaxes(
+                showgrid=True,
+                gridcolor="#1f2933"
+            )
+
+            fig.update_yaxes(
+                showgrid=True,
+                gridcolor="#1f2933"
             )
 
             st.plotly_chart(fig, use_container_width=True)
 
-        st.header("What's DuckBase Coin (DC)?")
+        st.header("What's DuckBase🪙?")
         st.markdown("""
-**DuckBase Coin (DC)** is the currency of Duckbase.
+DuckBase is a platform where you can earn **Duckbase Coin (DC)**.
 
-You can earn DC and watch the market graph on the home page.
-The price moves randomly like a crypto market.
+The market graph above simulates a crypto market like BTC.
 """)
 
     # -------- EARN -------- #
 
     if st.session_state.page == "earn":
 
-        st.header("Earn Duckbase Coin (DC)")
+        st.header("Earn DC")
 
         st.markdown("""
 Select number between 0 to 9 and click Start.  
-If matched, you earn 1 DC 🪙.
+If matched, you earn **1 DC**.
 """)
 
         selected_number = st.selectbox("Pick a number", list(range(10)))
@@ -257,9 +280,7 @@ If matched, you earn 1 DC 🪙.
                 st.session_state.cooldown_until = None
 
         if st.button("Start"):
-
             result = random.randint(0, 9)
-
             st.session_state.last_result = result
             st.session_state.selected_number = selected_number
             st.session_state.show_result = True
@@ -275,7 +296,6 @@ If matched, you earn 1 DC 🪙.
                 st.balloons()
                 st.success("You won 1 DC 🪙!")
                 st.rerun()
-
             else:
                 st.error("You lost!")
 
